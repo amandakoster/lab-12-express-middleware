@@ -24,3 +24,15 @@ noteRouter.get('/api/notes/:id', (req, res, next) => {
   .then(note => res.json(note))
   .catch(next);
 });
+
+noteRouter.put('/api/notes/:id',jsonParser, (req, res, next) => {
+  Note.findByIdAndUpdate(req.params.id, req.body, {new:true})
+  .then(note => res.json(note))
+  .catch(next);
+});
+
+noteRouter.delete('/api/notes/:id', jsonParser, (req, res, next) => {
+  Note.findByIdAndUpdate(req.params.id)
+  .then(() => res.sendStatus(204))
+  .catch(next);
+});
