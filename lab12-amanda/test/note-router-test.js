@@ -27,8 +27,15 @@ describe('testing note routes', () => {
     });
     it('should respond with 400', () => {
       superagent.post(`${API_URL}/api/notes`)
+      .send({type: 'Patricia'})
     .catch(err => {
       expect(err.status).toEqual(400);
+    });
+    });
+    it('should respond with 409', () => {
+      superagent.post(`${API_URL}/api/notes`)
+    .catch(err => {
+      expect(err.status).toEqual(409);
     });
     });
   });
@@ -42,6 +49,12 @@ describe('testing note routes', () => {
         expect(res.body.content).toEqual('grasshopper');
         expect(res.body.created).toEqual(tempNote.created);
       });
+    });
+    it('should respond with 404', () => {
+      superagent.post(`${API_URL}/api/notes0001`)
+    .catch(err => {
+      expect(err.status).toEqual(404);
+    });
     });
   });
 
@@ -70,7 +83,7 @@ describe('testing note routes', () => {
       });
     });
     it('should return a 404 for a not found if doesnt exist', () => {
-      return superagent.put(`${API_URL}/api/notes/78787878787`)
+      return superagent.put(`${API_URL}/api/notes/0001`)
       .catch(res => {
         expect(res.status).toEqual(404);
       });
