@@ -1,6 +1,7 @@
 'use strict';
 
 require('dotenv').config({path: `${__dirname}/../.test.env`});
+const faker = require('faker');
 const superagent = require('superagent');
 const expect = require('expect');
 const server = require('../lib/server.js');
@@ -26,8 +27,15 @@ describe('testing note routes', () => {
     });
     it('should respond with 400', () => {
       superagent.post(`${API_URL}/api/notes`)
+      .send({type: 'Patricia'})
     .catch(err => {
       expect(err.status).toEqual(400);
+    });
+    });
+    it('should respond with 409', () => {
+      superagent.post(`${API_URL}/api/notes`)
+    .catch(err => {
+      expect(err.status).toEqual(409);
     });
     });
   });
@@ -42,13 +50,19 @@ describe('testing note routes', () => {
         expect(res.body.created).toEqual(tempNote.created);
       });
     });
+    it('should respond with 404', () => {
+      superagent.post(`${API_URL}/api/notes0001`)
+    .catch(err => {
+      expect(err.status).toEqual(404);
+    });
+    });
   });
 
   describe('testing PUT requests to /api/notes', () => {
     afterEach(() => Note.remove({}));
     beforeEach(() => {
       return new Note ({
-        name: 'Patricia',
+        content: 'Evan',
       })
       .save()
       .then(res => {
@@ -57,7 +71,7 @@ describe('testing note routes', () => {
     });
     it('should return a 200 and update the note with correct passed info', () => {
       return superagent.put(`${API_URL}/api/notes/${tempNote._id}`)
-      .send({name: 'the rose garden', numOfMembers: 55})
+      .send({content: 'Patricia'})
       .then(res => {
         expect(res.status).toEqual(200);
       });
@@ -69,7 +83,7 @@ describe('testing note routes', () => {
       });
     });
     it('should return a 404 for a not found if doesnt exist', () => {
-      return superagent.put(`${API_URL}/api/notes/78787878787`)
+      return superagent.put(`${API_URL}/api/notes/0001`)
       .catch(res => {
         expect(res.status).toEqual(404);
       });
@@ -80,7 +94,7 @@ describe('testing note routes', () => {
     afterEach(() => Note.remove({}));
     beforeEach(() => {
       return new Note({
-        name: 'Patricia',
+        content: 'Patricia',
       })
         .save()
         .then(note => {

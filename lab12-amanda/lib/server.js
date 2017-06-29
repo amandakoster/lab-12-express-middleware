@@ -1,6 +1,7 @@
-
 'use strict';
 
+const cors = require('cors');
+const morgan = require('morgan');
 const express = require('express');
 const mongoose = require('mongoose');
 
@@ -10,34 +11,36 @@ mongoose.connect(process.env.MONGODB_URI);
 let server;
 const app = express();
 
-app.get('/api/hello', (req, res, next) => {
-  res.send('hello world');
-});
-
+app.use(cors());
+app.use(morgan('dev'));
 app.use(require('../route/note-router.js'));
-
-app.use((err,req,res,next) => {
-  res.sendStatus(500);
-});
+app.use(require('./error-middleware.js'));
 
 const serverControl = module.exports = {};
-
 serverControl.start = () => {
-  return new Promise((resolve) => {
-    server = app.listen(process.env.PORT, () => {
-      console.log('server up', process.env.PORT);
-      server.isOn = true;
-      resolve();
-    });
+  return new Promise((resolve, reject) => {
+    if(!server || !server.isOn){
+      server = app.listen(process.env.PORT, () => {
+        console.log('server up', process.env.PORT);
+        server.isOn = true;
+        resolve();
+      });
+      return;
+    }
+    reject();
   });
 };
 
 serverControl.stop = () => {
-  return new Promise((resolve) => {
-    server.close(() => {
-      console.log('server down');
-      server.isOn = false;
-      resolve();
-    });
+  return new Promise((resolve, reject) => {
+    if(server && server.isOn) {
+      server.close(() => {
+        console.log('server down');
+        server.isOn = false;
+        resolve();
+      });
+      return;
+    }
+    reject();
   });
 };
