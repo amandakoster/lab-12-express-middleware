@@ -1,6 +1,7 @@
 'use strict';
 
 require('dotenv').config({path: `${__dirname}/../.test.env`});
+const faker = require('faker');
 const superagent = require('superagent');
 const expect = require('expect');
 const server = require('../lib/server.js');
@@ -48,7 +49,7 @@ describe('testing note routes', () => {
     afterEach(() => Note.remove({}));
     beforeEach(() => {
       return new Note ({
-        name: 'Patricia',
+        content: 'Evan',
       })
       .save()
       .then(res => {
@@ -57,7 +58,7 @@ describe('testing note routes', () => {
     });
     it('should return a 200 and update the note with correct passed info', () => {
       return superagent.put(`${API_URL}/api/notes/${tempNote._id}`)
-      .send({name: 'the rose garden', numOfMembers: 55})
+      .send({content: 'Patricia'})
       .then(res => {
         expect(res.status).toEqual(200);
       });
@@ -80,7 +81,7 @@ describe('testing note routes', () => {
     afterEach(() => Note.remove({}));
     beforeEach(() => {
       return new Note({
-        name: 'Patricia',
+        content: 'Patricia',
       })
         .save()
         .then(note => {
